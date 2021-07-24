@@ -8,14 +8,25 @@ const genID = require('./genID');
 
 const app = new Koa();
 
-app.use(cors());
-app.use(koaBody({ json: true }));
+app.use(
+  cors({
+    origin: '*',
+    allowMethods: ['GET', 'POST', 'DELETE'],
+    allowHeaders: ['Content-Type'],
+  })
+);
+app.use(koaBody({ urlencoded: true, multipart: true }));
 
 const notes = [
   {
-    id: genID(),
     content: faker.lorem.sentence(),
     timestamp: Date.now(),
+    id: genID(),
+  },
+  {
+    content: faker.lorem.sentence(),
+    timestamp: Date.now(),
+    id: genID(),
   },
 ];
 
@@ -26,7 +37,11 @@ router.get('/notes', async (ctx, next) => {
 });
 
 router.post('/notes', async (ctx, next) => {
-  notes.push({ ...ctx.request.body, id: genID() });
+  notes.push({
+    ...ctx.request.body,
+    timestamp: Date.now(),
+    id: genID(),
+  });
   ctx.response.status = 204;
 });
 
